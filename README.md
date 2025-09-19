@@ -33,6 +33,20 @@ This project is **front-end only** with simulated APIs and local persistence.
 - Artificial latency & error rate for real-world feel  
 
 ---
+# Setup & Installation
+## Clone the repository
+```bash
+git clone https://github.com/username/talentflow.git
+cd talentflow
+```
+## Install dependencies
+```bash
+npm install
+```
+## Start development server
+```bash
+npm run dev
+```
 
 ## 🏗️ Architecture
 
