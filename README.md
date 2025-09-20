@@ -72,7 +72,8 @@ flowchart LR
   Moving jobs **downwards** currently does not reorder as expected.  
 - 🐢 **Kanban Board Performance:**  
   The Kanban board becomes **sluggish with large datasets (1000+ candidates)**.  
-  Optimization (e.g., virtualization, lazy-loading) is needed to improve performance.  
+  Optimization (e.g., virtualization, lazy-loading) is needed to improve performance.
+- Responsiveness can be improved. Please view the website from a laptop for the best experience.
 ---
 
 ## 🧠 Technical Decisions
