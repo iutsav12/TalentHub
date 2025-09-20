@@ -55,7 +55,7 @@ export default function JobDetailPage() {
     <div className="min-h-screen bg-background">
       <CircularNav />
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-30 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Button variant="ghost" onClick={() => router.back()}>

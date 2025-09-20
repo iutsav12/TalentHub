@@ -161,7 +161,7 @@ export default function CandidatesPage() {
 
       <div className="container mx-auto px-30 py-8">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pl-24">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h1 className="text-4xl font-bold mb-2">Candidates</h1>
             <p className="text-muted-foreground">
