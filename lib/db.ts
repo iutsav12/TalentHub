@@ -254,7 +254,7 @@ export async function seedDatabase() {
     "Vishakha",
     "Gulshan",
     "Shamvhavi",
-    "Muzhid",
+    "Muzahid",
   ]
   const lastNames = [
     "Kumar",

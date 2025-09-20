@@ -253,7 +253,7 @@ export default function JobsPage() {
     <div className="min-h-screen bg-background">
       <CircularNav />
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-10 py-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
