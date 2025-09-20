@@ -4,7 +4,13 @@ import { useEffect, useState, useMemo } from "react"
 import { Search, Filter, LayoutGrid, List } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { CircularNav } from "@/components/circular-nav"
 import { CandidatesList } from "@/components/candidates/candidates-list"
 import { CandidatesKanban } from "@/components/candidates/candidates-kanban"
@@ -19,14 +25,23 @@ export default function CandidatesPage() {
   const [stageFilter, setStageFilter] = useState<CandidateStage | "all">("all")
   const [viewMode, setViewMode] = useState<"list" | "kanban">("list")
 
+  // Pagination state
+  const [page, setPage] = useState(1)
+  const pageSize = 20
+
   useEffect(() => {
-    loadCandidates()
+    setTimeout(() => {
+      loadCandidates()
+    }, 500);
   }, [])
 
   const loadCandidates = async () => {
     try {
       await seedDatabase()
-      const allCandidates = await db.candidates.orderBy("createdAt").reverse().toArray()
+      const allCandidates = await db.candidates
+        .orderBy("createdAt")
+        .reverse()
+        .toArray()
       setCandidates(allCandidates)
     } catch (error) {
       console.error("Failed to load candidates:", error)
@@ -40,25 +55,46 @@ export default function CandidatesPage() {
     }
   }
 
+  // Filter dataset first (search + stage)
   const filteredCandidates = useMemo(() => {
     let filtered = candidates
 
     if (searchTerm) {
       filtered = filtered.filter(
         (candidate) =>
-          candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          candidate.email.toLowerCase().includes(searchTerm.toLowerCase()),
+          candidate.name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          candidate.email
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()),
       )
     }
 
     if (stageFilter !== "all") {
-      filtered = filtered.filter((candidate) => candidate.currentStage === stageFilter)
+      filtered = filtered.filter(
+        (candidate) => candidate.currentStage === stageFilter,
+      )
     }
 
     return filtered
   }, [candidates, searchTerm, stageFilter])
 
-  const handleStageChange = async (candidateId: string, newStage: CandidateStage) => {
+  // Apply pagination on filtered data
+  const paginatedCandidates = useMemo(() => {
+    const start = (page - 1) * pageSize
+    return filteredCandidates.slice(start, start + pageSize)
+  }, [filteredCandidates, page, pageSize])
+
+  // Reset to first page when filters/search change
+  useEffect(() => {
+    setPage(1)
+  }, [searchTerm, stageFilter])
+
+  const handleStageChange = async (
+    candidateId: string,
+    newStage: CandidateStage,
+  ) => {
     try {
       const candidate = candidates.find((c) => c.id === candidateId)
       if (!candidate) return
@@ -79,7 +115,9 @@ export default function CandidatesPage() {
       }
 
       await db.candidates.update(candidateId, updatedCandidate)
-      setCandidates((prev) => prev.map((c) => (c.id === candidateId ? updatedCandidate : c)))
+      setCandidates((prev) =>
+        prev.map((c) => (c.id === candidateId ? updatedCandidate : c)),
+      )
 
       toast({
         title: "Success",
@@ -98,7 +136,8 @@ export default function CandidatesPage() {
   const stageStats = useMemo(() => {
     const stats = candidates.reduce(
       (acc, candidate) => {
-        acc[candidate.currentStage] = (acc[candidate.currentStage] || 0) + 1
+        acc[candidate.currentStage] =
+          (acc[candidate.currentStage] || 0) + 1
         return acc
       },
       {} as Record<CandidateStage, number>,
@@ -114,19 +153,27 @@ export default function CandidatesPage() {
     )
   }
 
+  const totalPages = Math.ceil(filteredCandidates.length / pageSize)
+
   return (
     <div className="min-h-screen bg-background">
       <CircularNav />
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-30 py-8">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pl-24">
           <div>
             <h1 className="text-4xl font-bold mb-2">Candidates</h1>
-            <p className="text-muted-foreground">Track and manage candidate applications</p>
+            <p className="text-muted-foreground">
+              Track and manage candidate applications
+            </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant={viewMode === "list" ? "default" : "outline"} size="sm" onClick={() => setViewMode("list")}>
+            <Button
+              variant={viewMode === "list" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setViewMode("list")}
+            >
               <List size={16} className="mr-2" />
               List
             </Button>
@@ -144,7 +191,10 @@ export default function CandidatesPage() {
         {/* Filters */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
+            <Search
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+              size={20}
+            />
             <Input
               placeholder="Search candidates by name or email..."
               value={searchTerm}
@@ -152,7 +202,10 @@ export default function CandidatesPage() {
               className="pl-10"
             />
           </div>
-          <Select value={stageFilter} onValueChange={(value: any) => setStageFilter(value)}>
+          <Select
+            value={stageFilter}
+            onValueChange={(value: any) => setStageFilter(value)}
+          >
             <SelectTrigger className="w-full md:w-48">
               <Filter size={16} className="mr-2" />
               <SelectValue placeholder="Filter by stage" />
@@ -173,47 +226,94 @@ export default function CandidatesPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
           <div className="bg-card p-4 rounded-lg">
-            <div className="text-2xl font-bold text-primary">{candidates.length}</div>
+            <div className="text-2xl font-bold text-primary">
+              {candidates.length}
+            </div>
             <div className="text-sm text-muted-foreground">Total</div>
           </div>
           <div className="bg-card p-4 rounded-lg">
-            <div className="text-2xl font-bold text-blue-500">{stageStats.applied || 0}</div>
+            <div className="text-2xl font-bold text-blue-500">
+              {stageStats.applied || 0}
+            </div>
             <div className="text-sm text-muted-foreground">Applied</div>
           </div>
           <div className="bg-card p-4 rounded-lg">
-            <div className="text-2xl font-bold text-yellow-500">{stageStats.screening || 0}</div>
+            <div className="text-2xl font-bold text-yellow-500">
+              {stageStats.screening || 0}
+            </div>
             <div className="text-sm text-muted-foreground">Screening</div>
           </div>
           <div className="bg-card p-4 rounded-lg">
-            <div className="text-2xl font-bold text-purple-500">{stageStats.interview || 0}</div>
+            <div className="text-2xl font-bold text-purple-500">
+              {stageStats.interview || 0}
+            </div>
             <div className="text-sm text-muted-foreground">Interview</div>
           </div>
           <div className="bg-card p-4 rounded-lg">
-            <div className="text-2xl font-bold text-orange-500">{stageStats.assessment || 0}</div>
+            <div className="text-2xl font-bold text-orange-500">
+              {stageStats.assessment || 0}
+            </div>
             <div className="text-sm text-muted-foreground">Assessment</div>
           </div>
           <div className="bg-card p-4 rounded-lg">
-            <div className="text-2xl font-bold text-green-500">{stageStats.offer || 0}</div>
+            <div className="text-2xl font-bold text-green-500">
+              {stageStats.offer || 0}
+            </div>
             <div className="text-sm text-muted-foreground">Offer</div>
           </div>
           <div className="bg-card p-4 rounded-lg">
-            <div className="text-2xl font-bold text-emerald-500">{stageStats.hired || 0}</div>
+            <div className="text-2xl font-bold text-emerald-500">
+              {stageStats.hired || 0}
+            </div>
             <div className="text-sm text-muted-foreground">Hired</div>
           </div>
         </div>
 
         {/* Content */}
         {viewMode === "list" ? (
-          <CandidatesList candidates={filteredCandidates} onStageChange={handleStageChange} />
+          <CandidatesList
+            candidates={paginatedCandidates}
+            onStageChange={handleStageChange}
+          />
         ) : (
-          <CandidatesKanban candidates={filteredCandidates} onStageChange={handleStageChange} />
+          <CandidatesKanban
+            candidates={paginatedCandidates}
+            onStageChange={handleStageChange}
+          />
+        )}
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-6">
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={page === 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              Previous
+            </Button>
+            <span className="text-sm">
+              Page {page} of {totalPages}
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={page === totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next
+            </Button>
+          </div>
         )}
 
         {/* Empty State */}
         {filteredCandidates.length === 0 && (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">👥</div>
-            <h3 className="text-xl font-semibold mb-2">No candidates found</h3>
+            <h3 className="text-xl font-semibold mb-2">
+              No candidates found
+            </h3>
             <p className="text-muted-foreground mb-4">
               {searchTerm || stageFilter !== "all"
                 ? "Try adjusting your filters"
