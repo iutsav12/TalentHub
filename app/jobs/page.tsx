@@ -27,7 +27,9 @@ export default function JobsPage() {
 
   //seeds db and loads all jobs from db.jobs
   useEffect(() => {
-    loadJobs()
+    setTimeout(() => {
+      loadJobs();
+    }, 500);
   }, [])
 
   useEffect(() => {
