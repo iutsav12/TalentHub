@@ -68,8 +68,8 @@ flowchart LR
 ## ⚠️ Known Issues / Limitations
 
 - 🔄 **Job Reordering:**  
-  Drag-and-drop reordering only works reliably when moving jobs **downwards**.  
-  Moving jobs **upwards** currently does not reorder as expected.  
+  Drag-and-drop reordering only works reliably when moving jobs **upwards**.  
+  Moving jobs **downwards** currently does not reorder as expected.  
 - 🐢 **Kanban Board Performance:**  
   The Kanban board becomes **sluggish with large datasets (1000+ candidates)**.  
   Optimization (e.g., virtualization, lazy-loading) is needed to improve performance.  
