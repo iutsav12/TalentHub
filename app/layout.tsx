@@ -9,7 +9,7 @@ import "./globals.css"
 export const metadata: Metadata = {
   title: "TalentHub - Premium Job Management",
   description: "Professional recruitment platform with advanced candidate tracking and assessment tools",
-  generator: "v0.app",
+  generator: "Next.js",
 }
 
 export default function RootLayout({
